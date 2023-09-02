@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Microphone Transcription</title>
+</head>
+<body>
+    <h1>Microphone Transcription</h1>
+    
+    <button id="startButton" onclick="startRecording();">Start Recording</button>
+    <button id="stopButton" onclick="stopRecording();" disabled>Stop Recording</button>
+
+    <p>Transcription:</p>
+    <div id="transcriptionResult"></div>
+
+    <script>
+        let recognition;
+        let transcriptionResult = document.getElementById("transcriptionResult");
+
+        function startRecording() {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onresult = function(event) {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                transcriptionResult.innerHTML = finalTranscript;
+            };
+
+            recognition.onstart = function() {
+                document.getElementById("startButton").disabled = true;
+                document.getElementById("stopButton").disabled = false;
+            };
+
+            recognition.onend = function() {
+                document.getElementById("startButton").disabled = false;
+                document.getElementById("stopButton").disabled = true;
+            };
+
+            recognition.start();
+        }
+
+        function stopRecording() {
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+    </script>
+</body>
+</html>
